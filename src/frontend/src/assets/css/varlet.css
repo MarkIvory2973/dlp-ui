@@ -12,6 +12,10 @@ body {
   word-break: keep-all;
 }
 
-.progress .var-progress__linear-label {
+.var-progress {
+  width: 100%;
+}
+
+.var-progress .var-progress__linear-label {
   flex: unset;
 }
