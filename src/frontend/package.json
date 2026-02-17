@@ -1,0 +1,49 @@
+{
+  "name": "dlp-ui",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "run-s lint:*",
+    "lint:oxlint": "oxlint . --fix",
+    "lint:eslint": "eslint . --fix --cache",
+    "format": "prettier --write --experimental-cli src/"
+  },
+  "dependencies": {
+    "@varlet/touch-emulator": "^3.13.1",
+    "@varlet/ui": "^3.13.1",
+    "lodash": "^4.17.23",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.27",
+    "vue-router": "^5.0.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/lodash": "^4.17.23",
+    "@varlet/import-resolver": "^3.13.1",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "@vitejs/plugin-vue-jsx": "^5.1.3",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-oxlint": "~1.42.0",
+    "eslint-plugin-vue": "~10.7.0",
+    "globals": "^17.3.0",
+    "npm-run-all2": "^8.0.4",
+    "oxlint": "~1.42.0",
+    "postcss-px-to-viewport": "^1.1.1",
+    "prettier": "3.8.1",
+    "typescript": "^5.9.3",
+    "unplugin-auto-import": "^21.0.0",
+    "unplugin-vue-components": "^31.0.0",
+    "vite": "^7.3.1",
+    "vite-plugin-vue-devtools": "^8.0.5",
+    "vue-eslint-parser": "^10.2.0"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

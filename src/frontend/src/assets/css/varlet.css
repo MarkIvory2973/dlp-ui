@@ -1,0 +1,17 @@
+body {
+  transition:
+    background-color 0.25s,
+    color 0.25s;
+  color: var(--color-text);
+  background-color: var(--color-body);
+  color-scheme: var(--color-scheme);
+}
+
+.var-snackbar__content {
+  white-space: normal;
+  word-break: keep-all;
+}
+
+.progress .var-progress__linear-label {
+  flex: unset;
+}

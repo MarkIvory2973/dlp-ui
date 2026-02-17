@@ -1,0 +1,12 @@
+@import url('https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+  font-family: 'Roboto', 'Noto Sans SC', sans-serif;
+  font-optical-sizing: auto;
+  font-variation-settings: 'wdth' 100;
+}
+
+a {
+  color: var(--color-text);
+  text-decoration: none;
+}
