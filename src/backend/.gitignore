@@ -1,6 +1,6 @@
+ui/*
 bin/
 down/
-web/view/ui/*
 dlp-ui.log
 
 !.empty_folder

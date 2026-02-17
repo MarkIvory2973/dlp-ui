@@ -30,7 +30,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: fileURLToPath(new URL('../backend/web/view/ui', import.meta.url)),
+    outDir: fileURLToPath(new URL('../backend/ui', import.meta.url)),
     emptyOutDir: true,
   },
 })

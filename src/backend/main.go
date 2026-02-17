@@ -5,10 +5,16 @@ import (
 	"dlp-ui/utils"
 	"dlp-ui/web"
 	"dlp-ui/web/view"
+	"embed"
 	"fmt"
+	"io/fs"
+	"net/http"
 
 	"github.com/sirupsen/logrus"
 )
+
+//go:embed ui/*
+var ui embed.FS
 
 func printStartupInfo(logger *logrus.Logger) {
 	fmt.Println()
@@ -85,6 +91,12 @@ func main() {
 	// print startup infomations
 	printStartupInfo(logger)
 
+	// load ui from the binary
+	ui, err := fs.Sub(ui, "ui")
+	if err != nil {
+		logger.Fatal(err)
+	}
+
 	// create a new router
 	router := web.New(logger)
 
@@ -92,8 +104,8 @@ func main() {
 	view.Parse(router)
 	// route '/api/download'
 	view.Download(router)
-	// route '/'
-	view.UI(router)
+	// route '/ui'
+	router.StaticFS("/ui", http.FS(ui))
 
 	// listening and serving HTTP on :5000
 	router.Run(":5000")
