@@ -1,7 +1,15 @@
 package view
 
-import "github.com/gin-gonic/gin"
+import (
+	"embed"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+//go:embed ui/*
+var ui embed.FS
 
 func UI(router *gin.Engine) {
-	router.Static("/ui", "ui")
+	router.StaticFS("/ui", http.FS(ui))
 }
