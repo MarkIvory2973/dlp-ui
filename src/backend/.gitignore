@@ -1,6 +1,4 @@
-ui/*
+ui/
 bin/
 down/
 dlp-ui.log
-
-!.empty_folder
