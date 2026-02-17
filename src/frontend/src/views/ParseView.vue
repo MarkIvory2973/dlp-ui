@@ -18,7 +18,7 @@ const { baseUrl } = storeToRefs(useEnvStore())
 const { parseds } = storeToRefs(useParsedsStore())
 
 async function refresh() {
-  const response = await fetch(`${baseUrl}/api/parse`)
+  const response = await fetch(`${baseUrl.value}/api/parse`)
   if (!response.ok) {
     switch (response.status) {
       default: {

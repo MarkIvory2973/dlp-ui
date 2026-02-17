@@ -13,7 +13,7 @@ const { url, parsed } = defineProps(['url', 'parsed'])
 const { baseUrl } = storeToRefs(useEnvStore())
 
 async function download() {
-  const response = await fetch(`${baseUrl}/api/download`, {
+  const response = await fetch(`${baseUrl.value}/api/download`, {
     method: 'POST',
     body: JSON.stringify({
       url: url,

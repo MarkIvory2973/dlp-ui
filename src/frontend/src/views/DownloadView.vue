@@ -17,7 +17,7 @@ const { baseUrl } = storeToRefs(useEnvStore())
 const { downloads } = storeToRefs(useDownloadsStore())
 
 async function refresh() {
-  const response = await fetch(`${baseUrl}/api/download`)
+  const response = await fetch(`${baseUrl.value}/api/download`)
   if (!response.ok) {
     switch (response.status) {
       default: {

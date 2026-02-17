@@ -5,7 +5,13 @@ const { url, download } = defineProps(['url', 'download'])
 <template>
   <VarCard
     :title="url"
-    :subtitle="!download.progress.done ? `正在下载: ${download.title}` : '下载终了'"
+    :subtitle="
+      !download.progress.done
+        ? download.title == 'downloading'
+          ? '正在下载'
+          : `正在下载: ${download.title}`
+        : '下载终了'
+    "
   >
     <template v-if="download.errors" #description>
       <VarSpace class="alert" direction="column" size="large">
@@ -18,11 +24,7 @@ const { url, download } = defineProps(['url', 'download'])
       </VarSpace>
     </template>
     <template v-if="!download.progress.done" #extra>
-      <VarProgress
-        :value="(download.progress.current / download.progress.total) * 100"
-        line-width="100%"
-        label
-      >
+      <VarProgress :value="(download.progress.current / download.progress.total) * 100" label>
         {{ ((download.progress.current / download.progress.total) * 100).toFixed(0) }}%
         {{ (download.progress.speed / 1024 / 1024).toFixed(2) }} MB/s
       </VarProgress>

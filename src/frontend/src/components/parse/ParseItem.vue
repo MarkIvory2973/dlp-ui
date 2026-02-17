@@ -22,7 +22,7 @@ async function parse() {
       return
     }
 
-    const response = await fetch(`${baseUrl}/api/parse`, {
+    const response = await fetch(`${baseUrl.value}/api/parse`, {
       method: 'POST',
       body: JSON.stringify({
         url: url,

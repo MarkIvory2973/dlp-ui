@@ -13,7 +13,7 @@ const { url } = defineProps(['url'])
 const { baseUrl } = storeToRefs(useEnvStore())
 
 async function remove() {
-  const response = await fetch(`${baseUrl}/api/parse`, {
+  const response = await fetch(`${baseUrl.value}/api/parse`, {
     method: 'DELETE',
     body: JSON.stringify({
       url: url,
