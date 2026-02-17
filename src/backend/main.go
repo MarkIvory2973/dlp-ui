@@ -10,11 +10,25 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func printInfos(logger *logrus.Logger) {
+func printStartupInfo(logger *logrus.Logger) {
 	fmt.Println()
-	fmt.Println("  " + utils.Highlight + utils.Green + "DLP UI" + utils.Reset + " " + utils.Green + "v2.0-alpha" + utils.Reset + "  " + utils.Fade + "by 093" + utils.Reset)
+	fmt.Println("  " +
+		utils.UseStyles("DLP UI", utils.Highlight, utils.Green) +
+		" " +
+		utils.UseStyles("v1.2", utils.Green) +
+		"  " +
+		utils.UseStyles("by Mark Ivory", utils.Fade),
+	)
 	fmt.Println()
-	fmt.Println("  " + utils.Green + "➜" + utils.Reset + "  " + utils.Highlight + "本地:" + utils.Reset + "   " + utils.SkyBlue + "http://localhost:" + utils.Highlight + "5000" + utils.Reset + utils.SkyBlue + "/ui" + utils.Reset)
+	fmt.Println("  " +
+		utils.UseStyles("➜", utils.Green) +
+		"  " +
+		utils.UseStyles("本地:", utils.Highlight) +
+		"   " +
+		utils.UseStyles("http://localhost:", utils.SkyBlue) +
+		utils.UseStyles("5000", utils.SkyBlue, utils.Highlight) +
+		utils.UseStyles("/ui", utils.SkyBlue),
+	)
 
 	ips, err := utils.ListIPs()
 	if err != nil {
@@ -22,12 +36,42 @@ func printInfos(logger *logrus.Logger) {
 	}
 
 	for _, ip := range ips {
-		fmt.Println("  " + utils.Green + "➜" + utils.Reset + "  " + utils.Highlight + "局域网:" + utils.Reset + " " + utils.SkyBlue + "http://" + ip + ":" + utils.Highlight + "5000" + utils.Reset + utils.SkyBlue + "/ui" + utils.Reset)
+		fmt.Println("  " +
+			utils.UseStyles("➜", utils.Green) +
+			"  " +
+			utils.UseStyles("局域网:", utils.Highlight) +
+			" " +
+			utils.UseStyles("http://", utils.SkyBlue) +
+			utils.UseStyles(ip, utils.SkyBlue) +
+			":" +
+			utils.UseStyles("5000", utils.SkyBlue, utils.Highlight) +
+			utils.UseStyles("/ui", utils.SkyBlue),
+		)
 	}
 
-	fmt.Println("  " + utils.Green + "➜" + utils.Reset + "  " + utils.Highlight + "下载文件:" + utils.Reset + " " + utils.SkyBlue + "./down" + utils.Reset)
-	fmt.Println("  " + utils.Green + "➜" + utils.Reset + "  " + utils.Highlight + "日志文件:" + utils.Reset + " " + utils.SkyBlue + "./dlp-ui.log" + utils.Reset)
-	fmt.Println("  " + utils.Fade + utils.Green + "➜" + utils.Reset + "  " + utils.Fade + "按" + utils.Reset + " " + utils.Highlight + "CTRL + C" + utils.Reset + " " + utils.Fade + "退出程序" + utils.Reset)
+	fmt.Println("  " +
+		utils.UseStyles("➜", utils.Green) +
+		"  " +
+		utils.UseStyles("下载文件:", utils.Highlight) +
+		" " +
+		utils.UseStyles("./down", utils.SkyBlue),
+	)
+	fmt.Println("  " +
+		utils.UseStyles("➜", utils.Green) +
+		"  " +
+		utils.UseStyles("日志文件:", utils.Highlight) +
+		" " +
+		utils.UseStyles("./dlp-ui.log", utils.SkyBlue),
+	)
+	fmt.Println("  " +
+		utils.UseStyles("➜", utils.Fade, utils.Green) +
+		"  " +
+		utils.UseStyles("按", utils.Fade) +
+		" " +
+		utils.UseStyles("CTRL + C", utils.Highlight) +
+		" " +
+		utils.UseStyles("退出程序", utils.Fade),
+	)
 	fmt.Println()
 }
 
@@ -38,6 +82,9 @@ func main() {
 		panic(err)
 	}
 
+	// print startup infomations
+	printStartupInfo(logger)
+
 	// create a new router
 	router := web.New(logger)
 
@@ -47,9 +94,6 @@ func main() {
 	view.Download(router)
 	// route '/'
 	view.UI(router)
-
-	// print infomations
-	printInfos(logger)
 
 	// listening and serving HTTP on :5000
 	router.Run(":5000")
