@@ -64,7 +64,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ github.ref_name }}
-        name: Release ${{ github.ref_name }}
+        name: DLP UI ${{ github.ref_name }}
         draft: true
         files: dist/**
       env:
