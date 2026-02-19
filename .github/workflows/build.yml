@@ -57,8 +57,8 @@ jobs:
         esac
 
         mkdir -p dist
-        
-        go build -ldflags "-X main.tag=${{ github.ref_name }} -X main.commit=${{ github.sha::7 }}" -o "dist/${GOOUT}" src/backend
+
+        go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o "dist/${GOOUT}" src/backend
 
     - name: Create release
       uses: softprops/action-gh-release@v1
