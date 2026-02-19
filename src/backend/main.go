@@ -13,6 +13,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var (
+	tag    = "unknown"
+	commit = "none"
+)
+
 //go:embed ui/*
 var ui embed.FS
 
@@ -21,7 +26,9 @@ func printStartupInfo(logger *logrus.Logger) {
 	fmt.Println("  " +
 		utils.UseStyles("DLP UI", utils.Highlight, utils.Green) +
 		" " +
-		utils.UseStyles("v1.2", utils.Green) +
+		utils.UseStyles(tag, utils.Green) +
+		utils.UseStyles("+git.", utils.Green) +
+		utils.UseStyles(commit, utils.Green) +
 		"  " +
 		utils.UseStyles("by Mark Ivory", utils.Fade),
 	)
