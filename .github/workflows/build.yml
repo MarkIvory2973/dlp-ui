@@ -43,6 +43,8 @@ jobs:
         cd src/backend
         go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o ./dlp-ui_${GOOS}_${GOARCH} .
         if [[ "${{ matrix.os }}" == "windows-latest" ]]; then mv ./dlp-ui_${GOOS}_${GOARCH} ./dlp-ui_${GOOS}_${GOARCH}.exe; fi
+        mkdir -p ../../dist
+        mv ./dlp-ui_${GOOS}_${GOARCH} ../../dist
 
     - name: Create Draft Release
       uses: softprops/action-gh-release@v1
