@@ -38,13 +38,8 @@ jobs:
         mv src/frontend/dist src/backend/ui
 
     - name: Build backend
+      shell: bash
       run: |
-        case "${{ matrix.os }}" in
-          ubuntu-latest) export GOOS=linux ;;
-          windows-latest) export GOOS=windows ;;
-          macos-latest) export GOOS=darwin ;;
-        esac
-
         case "${{ matrix.arch }}" in
           arm64) export GOARCH=arm64 ;;
           amd64) export GOARCH=amd64 ;;
