@@ -1,0 +1,55 @@
+name: Build
+
+on:
+  push:
+    tags: "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        arch: [ arm64, amd64 ]
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 25.3
+        cache: 'yarn'
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.25'
+
+    - name: Build frontend
+      run: |
+        cd src/frontend
+        yarn install
+        yarn build
+
+    - name: Build backend
+      run: |
+        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then export GOOS=linux; fi
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then export GOOS=windows; fi
+        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then export GOOS=darwin; fi
+
+        if [[ "${{ matrix.arch }}" == "arm64" ]]; then export GOARCH=arm64; fi
+        if [[ "${{ matrix.arch }}" == "amd64" ]]; then export GOARCH=amd64; fi
+
+        cd src/backend
+        go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o ./dlp-ui_${GOOS}_${GOARCH} .
+        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then mv ./dlp-ui_${GOOS}_${GOARCH} ./dlp-ui_${GOOS}_${GOARCH}.exe; fi
+
+    - name: Create Draft Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+        draft: true
+        files: src/backend/dlp-ui_*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
