@@ -14,6 +14,8 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         arch: [ arm64, amd64 ]
+    outputs:
+      artifact_path: dist
     steps:
     - uses: actions/checkout@v4
 
@@ -31,24 +33,32 @@ jobs:
 
     - name: Build frontend
       run: |
-        cd src/frontend
-        yarn install
-        yarn build
+        yarn --cwd src/frontend install
+        yarn --cwd src/frontend build
+        mv src/frontend/dist src/backend/ui
 
     - name: Build backend
       run: |
-        if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then export GOOS=linux; fi
-        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then export GOOS=windows; fi
-        if [[ "${{ matrix.os }}" == "macos-latest" ]]; then export GOOS=darwin; fi
+        case "${{ matrix.os }}" in
+          ubuntu-latest) export GOOS=linux ;;
+          windows-latest) export GOOS=windows ;;
+          macos-latest) export GOOS=darwin ;;
+        esac
 
-        if [[ "${{ matrix.arch }}" == "arm64" ]]; then export GOARCH=arm64; fi
-        if [[ "${{ matrix.arch }}" == "amd64" ]]; then export GOARCH=amd64; fi
+        case "${{ matrix.arch }}" in
+          arm64) export GOARCH=arm64 ;;
+          amd64) export GOARCH=amd64 ;;
+        esac
 
-        cd src/backend
-        go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o ./dlp-ui_${GOOS}_${GOARCH} .
-        if [[ "${{ matrix.os }}" == "windows-latest" ]]; then mv ./dlp-ui_${GOOS}_${GOARCH} ./dlp-ui_${GOOS}_${GOARCH}.exe; fi
-        mkdir -p ../../dist
-        mv ./dlp-ui_${GOOS}_${GOARCH} ../../dist
+        case "${{ matrix.os }}" in
+          ubuntu-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH} ;;
+          windows-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH}.exe ;;
+          macos-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH} ;;
+        esac
+
+        mkdir -p dist
+        
+        go build -ldflags "-X main.tag=${{ github.ref_name }} -X main.commit=${{ github.sha::7 }}" -o "dist/${GOOUT}" src/backend
 
     - name: Create release
       uses: softprops/action-gh-release@v1

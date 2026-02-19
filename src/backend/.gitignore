@@ -1,4 +1,17 @@
-ui/
-bin/
-down/
-dlp-ui.log
+# Logs
+*.log
+
+.DS_Store
+ui
+bin
+down
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

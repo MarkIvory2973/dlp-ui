@@ -29,8 +29,4 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  build: {
-    outDir: fileURLToPath(new URL('../backend/ui', import.meta.url)),
-    emptyOutDir: true,
-  },
 })
