@@ -4,6 +4,9 @@ on:
   push:
     tags: "v*.*.*"
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -47,7 +50,7 @@ jobs:
         mkdir -p ../../dist
         mv ./dlp-ui_${GOOS}_${GOARCH} ../../dist
 
-    - name: Create Draft Release
+    - name: Create release
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ github.ref_name }}
