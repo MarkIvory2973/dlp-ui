@@ -54,7 +54,7 @@ jobs:
         mkdir -p dist
 
         cd src/backend
-        go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o "dist/${GOOUT}" .
+        go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o "../../dist/${GOOUT}" .
 
     - name: Create release
       uses: softprops/action-gh-release@v1
