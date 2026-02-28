@@ -8,14 +8,13 @@ Clone this repository:
 
 ```bash
 git clone https://github.com/MarkIvory2973/dlp-ui.git
+cd dlp-ui
 ```
 
 Install dependencies:
 
 ```bash
-cd src/frontend
-yarn install
-cd ../..
+yarn --cwd src/frontend install
 ```
 
 ⚠ The following binaries are required and must be placed in the `./bin` directory 
@@ -29,9 +28,8 @@ cd ../..
 Build frontend:
 
 ```bash
-cd src/frontend
-yarn build
-cd ../..
+yarn --cwd src/frontend build
+mv src/frontend/dist src/backend/ui
 ```
 
 Build backend:
@@ -39,7 +37,6 @@ Build backend:
 ```bash
 cd src/backend
 go build .
-cd ../..
 ```
 
 ## Usage
