@@ -4,9 +4,11 @@ import (
 	"dlp-ui/sidecar/ytdlp"
 	"dlp-ui/utils"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mssola/useragent"
 	"github.com/sirupsen/logrus"
 )
 
@@ -28,6 +30,10 @@ func Parse(router *gin.Engine) {
 	router.POST("/api/parse", func(context *gin.Context) {
 		// middlewares
 		logger := context.MustGet("logger").(*logrus.Entry)
+		// browser type
+		UA := useragent.New(context.Request.UserAgent())
+		browser, _ := UA.Browser()
+		browser = strings.ToLower(browser)
 		// data
 		var data struct {
 			URL string `json:"url"`
@@ -60,7 +66,7 @@ func Parse(router *gin.Engine) {
 		})
 
 		// create a new parser
-		parser, err := ytdlp.Parser(data.URL, &parseds)
+		parser, err := ytdlp.Parser(browser, data.URL, &parseds)
 		if err != nil {
 			// failure
 			logger.Errorf("failed to create a new parser: %v", err)

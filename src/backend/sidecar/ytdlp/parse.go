@@ -1,8 +1,10 @@
 package ytdlp
 
 import (
+	"bufio"
 	"dlp-ui/utils"
 	"fmt"
+	"os/exec"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -13,13 +15,28 @@ type Parsed struct {
 	Errors  []string         `json:"errors"`
 }
 
-func Parser(url string, parseds *sync.Map) (func(logger *logrus.Entry), error) {
-	// create a new command: ... -j "${url}"
-	command, stdout, stderr, err := new(
-		"-j", url,
-	)
-	if err != nil {
-		return nil, err
+func Parser(browser string, url string, parseds *sync.Map) (func(logger *logrus.Entry), error) {
+	var command *exec.Cmd
+	var stdout, stderr *bufio.Reader
+	var err error
+	if browser != "" {
+		// create a new command: ... --cookies-from-browser "${browser}" -j "${url}"
+		command, stdout, stderr, err = new(
+			"--cookies-from-browser", browser,
+			"-j", url,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+	} else {
+		// create a new command: ... -j "${url}"
+		command, stdout, stderr, err = new(
+			"-j", url,
+		)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// start to execute the command

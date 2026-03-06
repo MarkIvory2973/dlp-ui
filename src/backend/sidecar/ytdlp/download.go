@@ -1,9 +1,11 @@
 package ytdlp
 
 import (
+	"bufio"
 	"dlp-ui/utils"
 	"fmt"
 	"io"
+	"os/exec"
 	"strings"
 	"sync"
 
@@ -23,17 +25,35 @@ type Download struct {
 	Errors   []string `json:"errors"`
 }
 
-func Downloader(url string, format string, downloads *sync.Map) (func(logger *logrus.Entry), error) {
-	// create a new command: ... -f "${format}" --downloader-args "aria2c:--summary-interval=1 --human-readable=false" -O "before_dl:TITLE: %(title)s" -o "down/%(title)s.%(ext)s" "${url}"
-	command, stdout, stderr, err := new(
-		"-f", format,
-		"--downloader-args", "aria2c:--summary-interval=1 --human-readable=false",
-		"-O", "before_dl:TITLE: %(title)s",
-		"-o", "down/%(title)s.%(ext)s",
-		url,
-	)
-	if err != nil {
-		return nil, err
+func Downloader(browser string, url string, format string, downloads *sync.Map) (func(logger *logrus.Entry), error) {
+	var command *exec.Cmd
+	var stdout, stderr *bufio.Reader
+	var err error
+	if browser != "" {
+		// create a new command: ... --cookies-from-browser "${browser}" -f "${format}" --downloader-args "aria2c:--summary-interval=1 --human-readable=false" -O "before_dl:TITLE: %(title)s" -o "down/%(title)s.%(ext)s" "${url}"
+		command, stdout, stderr, err = new(
+			"--cookies-from-browser", browser,
+			"-f", format,
+			"--downloader-args", "aria2c:--summary-interval=1 --human-readable=false",
+			"-O", "before_dl:TITLE: %(title)s",
+			"-o", "down/%(title)s.%(ext)s",
+			url,
+		)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		// create a new command: ... -f "${format}" --downloader-args "aria2c:--summary-interval=1 --human-readable=false" -O "before_dl:TITLE: %(title)s" -o "down/%(title)s.%(ext)s" "${url}"
+		command, stdout, stderr, err = new(
+			"-f", format,
+			"--downloader-args", "aria2c:--summary-interval=1 --human-readable=false",
+			"-O", "before_dl:TITLE: %(title)s",
+			"-o", "down/%(title)s.%(ext)s",
+			url,
+		)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// start to execute the command

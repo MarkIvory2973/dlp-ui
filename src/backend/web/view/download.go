@@ -4,9 +4,11 @@ import (
 	"dlp-ui/sidecar/ytdlp"
 	"dlp-ui/utils"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mssola/useragent"
 	"github.com/sirupsen/logrus"
 )
 
@@ -28,6 +30,10 @@ func Download(router *gin.Engine) {
 	router.POST("/api/download", func(context *gin.Context) {
 		// middlewares
 		logger := context.MustGet("logger").(*logrus.Entry)
+		// browser type
+		UA := useragent.New(context.Request.UserAgent())
+		browser, _ := UA.Browser()
+		browser = strings.ToLower(browser)
 		// data
 		var data struct {
 			URL    string `json:"url"`
@@ -73,7 +79,7 @@ func Download(router *gin.Engine) {
 		})
 
 		// create a new downloader
-		downloader, err := ytdlp.Downloader(data.URL, data.Format, &downloads)
+		downloader, err := ytdlp.Downloader(browser, data.URL, data.Format, &downloads)
 		if err != nil {
 			// failure
 			logger.Errorf("failed to create a downloader: %v", err)

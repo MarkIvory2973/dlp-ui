@@ -34,7 +34,7 @@ func TestDownloader(t *testing.T) {
 				"trace": "test",
 			})
 
-			downloader, err := Downloader(cases[index][0], cases[index][1], &downloads)
+			downloader, err := Downloader("test", cases[index][0], cases[index][1], &downloads)
 			require.NoError(t, err)
 
 			downloader(logger)

@@ -34,7 +34,7 @@ func TestParser(t *testing.T) {
 				"trace": "test",
 			})
 
-			parser, err := Parser(cases[index], &parseds)
+			parser, err := Parser("test", cases[index], &parseds)
 			require.NoError(t, err)
 
 			parser(logger)

@@ -2,7 +2,6 @@ package ytdlp
 
 import (
 	"bufio"
-	"os"
 	"os/exec"
 )
 
@@ -11,17 +10,6 @@ var commonArgs = []string{
 	"--downloader", "bin/aria2c",
 	"--ffmpeg-location", "bin",
 }
-
-/* TODO: 2.0-alpha test */
-
-func init() {
-	browser := os.Getenv("ALPHA_BROWSER")
-	if browser != "" {
-		commonArgs = append(commonArgs, "--cookies-from-browser", browser)
-	}
-}
-
-/* TODO: 2.0-alpha test */
 
 func new(extraArgs ...string) (*exec.Cmd, *bufio.Reader, *bufio.Reader, error) {
 	// create a new command: bin/yt-dlp -q --no-warnings --downloader "bin/aria2c" --ffmpeg-location "bin" ...
