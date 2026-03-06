@@ -60,12 +60,27 @@ jobs:
         cd src/backend
         go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o "../../dist/${GOOUT}" .
 
-    - name: Create release
-      uses: softprops/action-gh-release@v1
+    - uses: actions/upload-artifact@v4
       with:
-        tag_name: ${{ github.ref_name }}
-        name: DLP UI ${{ github.ref_name }}
-        draft: true
-        files: dist/**
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        name: binaries
+        path: dist
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: binaries
+          path: dist
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: DLP UI ${{ github.ref_name }}
+          draft: true
+          files: dist/**
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
