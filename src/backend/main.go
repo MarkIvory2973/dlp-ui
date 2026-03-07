@@ -28,7 +28,7 @@ func printStartupInfo(logger *logrus.Logger) {
 		" " +
 		utils.UseStyles(tag, utils.Green) +
 		utils.UseStyles("+git.", utils.Green) +
-		utils.UseStyles(commit, utils.Green) +
+		utils.UseStyles(commit[:min(len(commit), 7)], utils.Green) +
 		"  " +
 		utils.UseStyles("by Mark Ivory", utils.Fade),
 	)
