@@ -45,9 +45,8 @@ jobs:
           name: dist-frontend
           path: src/frontend/dist
 
-      - run: mv src/frontend/dist src/backend/ui
-
       - run: ls src/frontend/dist
+      - run: mv src/frontend/dist src/backend/ui
 
       - name: Set up Go
         uses: actions/setup-go@v4
