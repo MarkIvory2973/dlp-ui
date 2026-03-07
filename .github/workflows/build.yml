@@ -8,71 +8,91 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 25.3
+          cache: 'yarn'
+          cache-dependency-path: src/frontend/yarn.lock
+
+      - name: Build frontend
+        run: |
+          yarn --cwd src/frontend install
+          yarn --cwd src/frontend build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-frontend
+          path: src/frontend/dist/*
+
+  build-backend:
+    needs: build-frontend
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         arch: [ arm64, amd64 ]
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 25.3
-        cache: 'yarn'
-        cache-dependency-path: src/frontend/yarn.lock
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-frontend
+          path: src/frontend/dist
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.25'
+      - run: mv src/frontend/dist src/backend/ui
 
-    - name: Build frontend
-      run: |
-        yarn --cwd src/frontend install
-        yarn --cwd src/frontend build
-        mv src/frontend/dist src/backend/ui
+      - run: ls src/frontend/dist
 
-    - name: Build backend
-      shell: bash
-      run: |
-        case "${{ matrix.os }}" in
-          ubuntu-latest) export GOOS=linux ;;
-          windows-latest) export GOOS=windows ;;
-          macos-latest) export GOOS=darwin ;;
-        esac
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+          cache-dependency-path: src/backend/go.sum
 
-        case "${{ matrix.arch }}" in
-          arm64) export GOARCH=arm64 ;;
-          amd64) export GOARCH=amd64 ;;
-        esac
+      - name: Build backend
+        shell: bash
+        run: |
+          case "${{ matrix.os }}" in
+            ubuntu-latest) export GOOS=linux ;;
+            windows-latest) export GOOS=windows ;;
+            macos-latest) export GOOS=darwin ;;
+          esac
 
-        case "${{ matrix.os }}" in
-          ubuntu-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH} ;;
-          windows-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH}.exe ;;
-          macos-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH} ;;
-        esac
+          case "${{ matrix.arch }}" in
+            arm64) export GOARCH=arm64 ;;
+            amd64) export GOARCH=amd64 ;;
+          esac
 
-        mkdir -p dist
+          case "${{ matrix.os }}" in
+            ubuntu-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH} ;;
+            windows-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH}.exe ;;
+            macos-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH} ;;
+          esac
 
-        cd src/backend
-        go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o "../../dist/${GOOUT}" .
+          mkdir -p dist
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: dist-${{ matrix.os }}-${{ matrix.arch }}
-        path: dist/*
+          cd src/backend
+          go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o "../../dist/${GOOUT}" .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-backend-${{ matrix.os }}-${{ matrix.arch }}
+          path: dist/*
 
   release:
-    needs: build
+    needs: build-backend
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: dist-*-*
+          pattern: dist-backend-*-*
+          merge-multiple: true
           path: dist
 
       - name: Create release
@@ -81,6 +101,6 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: DLP UI ${{ github.ref_name }}
           draft: true
-          files: dist/**
+          files: dist/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
