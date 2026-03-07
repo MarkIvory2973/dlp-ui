@@ -25,9 +25,10 @@ jobs:
           yarn --cwd src/frontend install
           yarn --cwd src/frontend build
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifact ui
+        uses: actions/upload-artifact@v4
         with:
-          name: dist-frontend
+          name: artifact_build-frontend
           path: src/frontend/dist/*
 
   build-backend:
@@ -40,13 +41,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
+      - name: Download artifact ui
+        uses: actions/download-artifact@v4
         with:
-          name: dist-frontend
+          name: artifact_build-frontend
           path: src/frontend/dist
 
-      - run: ls src/frontend/dist
-      - run: mv src/frontend/dist src/backend/ui
+      - name: Move artifact ui to backend
+        run: mv src/frontend/dist src/backend/ui
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -79,18 +81,20 @@ jobs:
           cd src/backend
           go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o "../../dist/${GOOUT}" .
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifact dist
+        uses: actions/upload-artifact@v4
         with:
-          name: dist-backend-${{ matrix.os }}-${{ matrix.arch }}
+          name: artifact_backend-build_${{ matrix.os }}_${{ matrix.arch }}
           path: dist/*
 
   release:
     needs: build-backend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Download artifact dist
+        uses: actions/download-artifact@v4
         with:
-          pattern: dist-backend-*-*
+          pattern: artifact_backend-build_*_*
           merge-multiple: true
           path: dist
 
