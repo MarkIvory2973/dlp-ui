@@ -4,14 +4,14 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
-watch(route, (route) => {
+watch(route, () => {
   active.value = route.name
 })
 
-const active = ref('parse')
+const active = ref(route.name)
 const router = useRouter()
-watch(active, (name) => {
-  router.push({ name: name })
+watch(active, () => {
+  router.push({ name: active.value })
 })
 </script>
 

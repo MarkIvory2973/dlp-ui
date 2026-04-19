@@ -2,13 +2,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 // local
-import ParseView from '../views/ParseView.vue'
+import ParseView from '@/views/ParseView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
+      path: '/parse',
       name: 'parse',
       component: ParseView,
       meta: { title: '解析' },
@@ -16,7 +16,7 @@ const router = createRouter({
     {
       path: '/download',
       name: 'download',
-      component: () => import('../views/DownloadView.vue'),
+      component: () => import('@/views/DownloadView.vue'),
       meta: { title: '下载' },
     },
   ],

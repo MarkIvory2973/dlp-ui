@@ -2,26 +2,17 @@
 // vue
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
-// zod
+// varlet
 import z from 'zod'
+import { Snackbar } from '@varlet/ui'
 // local
 import { useEnvStore } from '@/stores/env'
 
-// varlet
-import { Snackbar } from '@varlet/ui'
-
+const urlsForm = ref(null)
+const urls = ref('')
 const { baseUrl } = storeToRefs(useEnvStore())
-
-const form = ref(null)
-const url = ref('')
-
-async function parse() {
-  url.value.split('\n').forEach(async (url, index) => {
-    url = url.trim(' ')
-    if (!url) {
-      return
-    }
-
+function parse() {
+  urls.value.split('\n').forEach(async (url, index) => {
     const response = await fetch(`${baseUrl.value}/api/parse`, {
       method: 'POST',
       body: JSON.stringify({
@@ -46,32 +37,24 @@ async function parse() {
     setTimeout(() => Snackbar.success('成功请求解析 URL'), index * 3000)
   })
 
-  form.value.reset()
+  urlsForm.value.reset()
 }
 </script>
 
 <template>
-  <VarSpace direction="column" size="large">
-    <VarInput
-      ref="form"
-      v-model.trim="url"
-      :rules="z.url('无效的 URL').or(z.literal(''))"
-      placeholder="URL"
-      variant="outlined"
-      :rows="url.split('\n').length"
-      textarea
-      clearable
-    />
+  <VarInput
+    ref="urlsForm"
+    v-model.trim="urls"
+    :rules="z.url('无效的 URL').or(z.literal(''))"
+    :rows="urls.split('\n').length"
+    placeholder="URL"
+    variant="outlined"
+    textarea
+    clearable
+  />
 
-    <VarButton @click="parse" :disabled="!url" type="primary">
-      <VarIcon name="xml" />
-      解析
-    </VarButton>
-  </VarSpace>
+  <VarButton @click="parse" :disabled="!urls" type="primary">
+    <VarIcon name="xml" />
+    解析
+  </VarButton>
 </template>
-
-<style scoped>
-button {
-  width: 100%;
-}
-</style>

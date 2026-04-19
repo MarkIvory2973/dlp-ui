@@ -1,11 +1,12 @@
-@import './font.css';
-
 body {
-  margin: 0;
+  margin: 0 auto;
+  max-width: 480px;
+  background-color: color-mix(in srgb, var(--color-body) 85%, black 15%);
 }
 
-div#app {
+body > div#app {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100dvh;
+  background-color: var(--color-body);
 }

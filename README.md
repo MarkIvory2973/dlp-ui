@@ -11,10 +11,10 @@ git clone https://github.com/MarkIvory2973/dlp-ui.git
 cd dlp-ui
 ```
 
-Install dependencies:
+Build the frontend and the backend:
 
 ```bash
-yarn --cwd src/frontend install
+make build
 ```
 
 ⚠ The following binaries are required and must be placed in the `./bin` directory 
@@ -25,21 +25,9 @@ yarn --cwd src/frontend install
 - [x] `ffmpeg`
 - [x] `ffprobe`
 
-Build frontend:
-
-```bash
-yarn --cwd src/frontend build
-mv src/frontend/dist src/backend/ui
-```
-
-Build backend:
-
-```bash
-cd src/backend
-go build .
-```
-
 ## Usage
+
+Run the following command:
 
 ```bash
 ./dlp-ui

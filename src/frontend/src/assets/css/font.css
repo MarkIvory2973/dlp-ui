@@ -1,12 +1,33 @@
-@import url('https://fonts.loli.net/css2?family=Noto+Sans+SC:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-
-* {
-  font-family: 'Roboto', 'Noto Sans SC', sans-serif;
-  font-optical-sizing: auto;
-  font-variation-settings: 'wdth' 100;
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-VariableFont_wdth\,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
 }
 
-a {
-  color: var(--color-text);
-  text-decoration: none;
+@font-face {
+  font-family: 'Roboto';
+  src: url('../fonts/Roboto-Italic-VariableFont_wdth\,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Noto Sans SC';
+  src: url('../fonts/NotoSansSC-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Sans TC';
+  src: url('../fonts/NotoSansTC-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+* {
+  font-family: 'Roboto', 'Noto Sans SC', 'Noto Sans TC', sans-serif;
+  font-optical-sizing: auto;
+  font-variation-settings: 'wdth' 100;
 }

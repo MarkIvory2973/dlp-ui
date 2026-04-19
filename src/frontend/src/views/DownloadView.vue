@@ -2,27 +2,26 @@
 // vue
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted } from 'vue'
+// varlet
+import { Snackbar } from '@varlet/ui'
 // lodash
-import isEqual from 'lodash/isEqual'
+import { isEqual } from 'lodash'
 // local
 import { useEnvStore } from '@/stores/env'
 import { useDownloadsStore } from '@/stores/download/downloads'
 
-// varlet
-import { Snackbar } from '@varlet/ui'
 // local
-import DownloadItem from '@/components/download/DownloadItem.vue'
+import DownloadsItem from '@/components/download/DownloadsItem.vue'
 
 const { baseUrl } = storeToRefs(useEnvStore())
 const { downloads } = storeToRefs(useDownloadsStore())
-
 async function refresh() {
   const response = await fetch(`${baseUrl.value}/api/download`)
   if (!response.ok) {
     switch (response.status) {
       default: {
         const error = (await response.text()) || '未知错误'
-        Snackbar.error(`无法刷新下载队列: ${error}`)
+        Snackbar.error(`无法刷新下载结果: ${error}`)
         break
       }
     }
@@ -30,7 +29,7 @@ async function refresh() {
   }
 
   const newDownloads = await response.json()
-  if (!isEqual(downloads.value, newDownloads)) {
+  if (newDownloads && !isEqual(downloads.value, newDownloads)) {
     downloads.value = newDownloads
   }
 }
@@ -38,7 +37,7 @@ async function refresh() {
 let timer = null
 onMounted(async () => {
   await refresh()
-  timer = setInterval(refresh, 1000)
+  timer = setInterval(refresh, 500)
 })
 onUnmounted(() => {
   clearInterval(timer)
@@ -47,14 +46,19 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <VarSpace direction="column" size="large">
-    <DownloadItem
-      v-for="url in Object.keys(downloads)"
-      v-bind:key="url"
-      :url="url"
-      :download="downloads[url]"
-    />
-  </VarSpace>
+  <VarAlert title="下载文件: ./down" />
+
+  <p>下载队列 ({{ downloads.length }})</p>
+
+  <div class="stack">
+    <DownloadsItem />
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+div.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+</style>

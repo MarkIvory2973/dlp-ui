@@ -7,9 +7,8 @@ body {
   color-scheme: var(--color-scheme);
 }
 
-.var-snackbar__content {
-  white-space: normal;
-  word-break: keep-all;
+.var-alert .var-alert__message {
+  line-height: unset;
 }
 
 .var-progress {

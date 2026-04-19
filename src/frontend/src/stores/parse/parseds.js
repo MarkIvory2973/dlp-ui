@@ -1,9 +1,9 @@
 // vue
-import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { defineStore } from 'pinia'
 
 export const useParsedsStore = defineStore('parseds', () => {
-  const parseds = ref({})
+  const parseds = ref([])
 
   return { parseds }
 })

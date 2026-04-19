@@ -2,21 +2,20 @@
 // vue
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted } from 'vue'
+// varlet
+import { Snackbar } from '@varlet/ui'
 // lodash
-import isEqual from 'lodash/isEqual'
+import { isEqual } from 'lodash'
 // local
 import { useEnvStore } from '@/stores/env'
 import { useParsedsStore } from '@/stores/parse/parseds'
 
-// varlet
-import { Snackbar } from '@varlet/ui'
 // local
 import ParseItem from '@/components/parse/ParseItem.vue'
-import ParsedItem from '@/components/parse/ParsedItem.vue'
+import ParsedsItem from '@/components/parse/ParsedsItem.vue'
 
 const { baseUrl } = storeToRefs(useEnvStore())
 const { parseds } = storeToRefs(useParsedsStore())
-
 async function refresh() {
   const response = await fetch(`${baseUrl.value}/api/parse`)
   if (!response.ok) {
@@ -31,7 +30,7 @@ async function refresh() {
   }
 
   const newParseds = await response.json()
-  if (!isEqual(parseds.value, newParseds)) {
+  if (newParseds && !isEqual(parseds.value, newParseds)) {
     parseds.value = newParseds
   }
 }
@@ -39,7 +38,7 @@ async function refresh() {
 let timer = null
 onMounted(async () => {
   await refresh()
-  timer = setInterval(refresh, 5000)
+  timer = setInterval(refresh, 200)
 })
 onUnmounted(() => {
   clearInterval(timer)
@@ -48,24 +47,21 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <VarSpace direction="column" size="large">
+  <div class="stack">
     <ParseItem />
+  </div>
 
-    <span>解析结果 ({{ Object.entries(parseds).length }})</span>
+  <p>解析结果 ({{ parseds.length }})</p>
 
-    <ParsedItem
-      v-for="url in Object.keys(parseds)"
-      v-bind:key="url"
-      @refresh="refresh"
-      :url="url"
-      :parsed="parseds[url]"
-    />
-  </VarSpace>
+  <div class="stack">
+    <ParsedsItem />
+  </div>
 </template>
 
 <style scoped>
-span {
-  cursor: default;
-  user-select: none;
+div.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 </style>

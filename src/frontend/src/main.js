@@ -14,6 +14,7 @@ import './assets/css/varlet.css'
 import '@varlet/touch-emulator'
 // local
 import './assets/css/main.css'
+import './assets/css/font.css'
 
 const app = createApp(App)
 

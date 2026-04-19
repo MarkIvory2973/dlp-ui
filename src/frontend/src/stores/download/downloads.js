@@ -1,9 +1,9 @@
 // vue
-import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { defineStore } from 'pinia'
 
 export const useDownloadsStore = defineStore('downloads', () => {
-  const downloads = ref({})
+  const downloads = ref([])
 
   return { downloads }
 })

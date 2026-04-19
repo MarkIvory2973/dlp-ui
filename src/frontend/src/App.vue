@@ -1,7 +1,8 @@
 <script setup>
 // vue
-import { RouterView } from 'vue-router'
+import { watch, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import { RouterView } from 'vue-router'
 // varlet
 import { StyleProvider } from '@varlet/ui'
 // local
@@ -12,7 +13,13 @@ import TitleItem from './components/TitleItem.vue'
 import NavItem from './components/NavItem.vue'
 
 const { theme } = storeToRefs(useThemeStore())
-StyleProvider(theme.value)
+watch(theme, () => {
+  StyleProvider(theme.value)
+})
+
+onMounted(() => {
+  StyleProvider(theme.value)
+})
 </script>
 
 <template>
@@ -31,13 +38,17 @@ StyleProvider(theme.value)
 
 <style scoped>
 header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 main {
   flex: 1;
   padding: 0 1rem;
-  padding-top: 4px;
+  padding-top: 0.5rem;
   overflow-y: scroll;
 }
 </style>
