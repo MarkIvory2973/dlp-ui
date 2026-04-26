@@ -66,14 +66,14 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          case ${GOOS} in
+          case "${GOOS}" in
             linux) export GOOUT=dlp-ui_linux_${GOARCH} ;;
             windows) export GOOUT=dlp-ui_windows_${GOARCH}.exe ;;
             darwin) export GOOUT=dlp-ui_macos_${GOARCH} ;;
           esac
 
           cd src/backend
-          go build -ldflags "-X cmd.cli.tag=${GITHUB_REF_NAME} -X cmd.cli.commit=${GITHUB_SHA}" -o ${GOOUT}
+          go build -ldflags "-X cmd.cli.tag=${GITHUB_REF_NAME} -X cmd.cli.commit=${GITHUB_SHA}" -o "${GOOUT}"
 
       - uses: actions/upload-artifact@v7
         with:
