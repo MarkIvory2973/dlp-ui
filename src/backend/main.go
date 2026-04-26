@@ -23,7 +23,7 @@ func main() {
 		panic(err)
 	}
 
-	webUI, err := fs.Sub(embedFS, "embed/webui")
+	webuiFS, err := fs.Sub(embedFS, "embed/webui")
 	if err != nil {
 		logger.Fatalf("failed to load webui: %v", err)
 	}
@@ -41,7 +41,7 @@ func main() {
 
 	views.RouteParse(router)
 	views.RouteDownload(router)
-	router.StaticFS("/webui", http.FS(webUI))
+	router.StaticFS("/webui", http.FS(webuiFS))
 
 	router.Run("localhost:5000")
 }
