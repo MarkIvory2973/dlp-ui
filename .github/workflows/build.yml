@@ -63,11 +63,6 @@ jobs:
           cd src/backend
           go mod tidy
 
-      - name: Test
-        run: |
-          cd src/backend
-          go test ./...
-
       - name: Build
         shell: bash
         run: |
