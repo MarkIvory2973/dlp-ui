@@ -23,7 +23,7 @@ jobs:
       - name: Install
         run: |
           cd src/frontend
-          npm run install
+          npm install
 
       - name: Build
         run: |
