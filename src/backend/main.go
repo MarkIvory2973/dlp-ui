@@ -23,7 +23,7 @@ func main() {
 		panic(err)
 	}
 
-	webUI, err := fs.Sub(embedFS, "webui")
+	webUI, err := fs.Sub(embedFS, "embed/webui")
 	if err != nil {
 		logger.Fatalf("failed to load webui: %v", err)
 	}
