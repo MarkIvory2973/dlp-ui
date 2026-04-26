@@ -61,7 +61,7 @@ jobs:
       - name: Install
         run: |
           cd src/backend
-          go mod tody
+          go mod tidy
 
       - name: Test
         run: |
