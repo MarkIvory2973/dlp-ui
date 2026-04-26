@@ -91,9 +91,15 @@ jobs:
           merge-multiple: true
           path: dist
 
+      - run: ls
+
+      - run: ls dist
+
+      - run: ls -R dist
+
       - name: Release
         uses: softprops/action-gh-release@v3
         with:
           name: DLP UI ${{ github.ref_name }}
           draft: true
-          files: dist/*
+          files: dist
