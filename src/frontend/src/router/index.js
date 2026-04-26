@@ -8,7 +8,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/parse',
+      path: '/',
       name: 'parse',
       component: ParseView,
       meta: { title: '解析' },
