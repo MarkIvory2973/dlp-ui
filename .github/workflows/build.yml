@@ -95,4 +95,4 @@ jobs:
         with:
           name: DLP UI ${{ github.ref_name }}
           draft: true
-          files: dist
+          files: dist/*
