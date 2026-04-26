@@ -1,6 +1,6 @@
 # DLP UI
 
-DLP UI is a frontend of yt-dlp.
+DLP UI is a frontend for yt-dlp.
 
 ## Installation
 
