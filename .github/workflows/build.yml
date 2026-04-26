@@ -73,12 +73,13 @@ jobs:
           esac
 
           cd src/backend
-          go build -ldflags "-X cmd.cli.tag=${GITHUB_REF_NAME} -X cmd.cli.commit=${GITHUB_SHA}" -o "${GOOUT}"
+          mkdir dist
+          go build -ldflags "-X cmd.cli.tag=${GITHUB_REF_NAME} -X cmd.cli.commit=${GITHUB_SHA}" -o "dist/${GOOUT}"
 
       - uses: actions/upload-artifact@v7
         with:
           name: backend_${{ matrix.os }}_${{ matrix.arch }}
-          path: src/backend/dlp-ui
+          path: src/backend/dist
 
   release:
     needs: backend
