@@ -2,108 +2,102 @@ name: Build
 
 on:
   push:
-    tags: "v*.*.*"
+    tags: v*.*.*
 
 permissions:
   contents: write
 
 jobs:
-  build-frontend:
+  frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: 25.3
-          cache: 'yarn'
-          cache-dependency-path: src/frontend/yarn.lock
+          node-version: 25
+          cache: npm
+          cache-dependency-path: src/frontend/package-lock.json
 
-      - name: Build frontend
+      - name: Install
         run: |
-          yarn --cwd src/frontend install
-          yarn --cwd src/frontend build
+          cd src/frontend
+          npm run install
 
-      - name: Upload artifact ui
-        uses: actions/upload-artifact@v4
+      - name: Build
+        run: |
+          cd src/frontend
+          npm run build
+
+      - uses: actions/upload-artifact@v7
         with:
-          name: artifact_build-frontend
-          path: src/frontend/dist/*
+          name: frontend
+          path: src/frontend/dist
 
-  build-backend:
-    needs: build-frontend
+  backend:
+    needs: frontend
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         arch: [ arm64, amd64 ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Download artifact ui
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
-          name: artifact_build-frontend
+          name: frontend
           path: src/frontend/dist
 
-      - name: Move artifact ui to backend
-        run: mv src/frontend/dist src/backend/ui
+      - run: mv src/frontend/dist src/backend/embed/webui
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
+      - name: Setup Go
+        uses: actions/setup-go@v6
         with:
-          go-version: '1.25'
+          go-version: 1.26
           cache-dependency-path: src/backend/go.sum
 
-      - name: Build backend
+      - name: Install
+        run: |
+          cd src/backend
+          go mod tody
+
+      - name: Test
+        run: |
+          cd src/backend
+          go test ./...
+
+      - name: Build
         shell: bash
         run: |
-          case "${{ matrix.os }}" in
-            ubuntu-latest) export GOOS=linux ;;
-            windows-latest) export GOOS=windows ;;
-            macos-latest) export GOOS=darwin ;;
+          case ${GOOS} in
+            linux) export GOOUT=dlp-ui_linux_${GOARCH} ;;
+            windows) export GOOUT=dlp-ui_windows_${GOARCH}.exe ;;
+            darwin) export GOOUT=dlp-ui_macos_${GOARCH} ;;
           esac
-
-          case "${{ matrix.arch }}" in
-            arm64) export GOARCH=arm64 ;;
-            amd64) export GOARCH=amd64 ;;
-          esac
-
-          case "${{ matrix.os }}" in
-            ubuntu-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH} ;;
-            windows-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH}.exe ;;
-            macos-latest) export GOOUT=dlp-ui_${GOOS}_${GOARCH} ;;
-          esac
-
-          mkdir -p dist
 
           cd src/backend
-          go build -ldflags "-X main.tag=${GITHUB_REF_NAME} -X main.commit=${GITHUB_SHA}" -o "../../dist/${GOOUT}" .
+          go build -ldflags "-X cmd.cli.tag=${GITHUB_REF_NAME} -X cmd.cli.commit=${GITHUB_SHA}" -o $GOOUT
 
-      - name: Upload artifact dist
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: artifact_backend-build_${{ matrix.os }}_${{ matrix.arch }}
-          path: dist/*
+          name: backend_${{ matrix.os }}_${{ matrix.arch }}
+          path: src/backend/dlp-ui
 
   release:
-    needs: build-backend
+    needs: backend
     runs-on: ubuntu-latest
     steps:
-      - name: Download artifact dist
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
-          pattern: artifact_backend-build_*_*
+          pattern: backend_*_*
           merge-multiple: true
           path: dist
 
-      - name: Create release
-        uses: softprops/action-gh-release@v1
+      - name: Release
+        uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ github.ref_name }}
           name: DLP UI ${{ github.ref_name }}
           draft: true
-          files: dist/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: dist
