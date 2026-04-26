@@ -92,7 +92,6 @@ jobs:
         with:
           pattern: backend_*_*
           merge-multiple: true
-          path: dist
 
       - name: Release
         uses: softprops/action-gh-release@v3
