@@ -41,7 +41,7 @@ Clean files:
 make clean
 ```
 
-> ℹ️ **Note:**
+> **Note:**
 >
 > The following binaries are required and must be placed in the `./bin` directory (the same directory as the `dlp-ui` executable):
 >
