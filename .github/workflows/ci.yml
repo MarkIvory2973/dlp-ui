@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    tags: v*.*.*
+
+permissions:
+  contents: write
+
+jobs:
+  test-frontend:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: src/frontend/package.json
+          cache: npm
+          cache-dependency-path: src/frontend/package-lock.json
+
+      - name: Install
+        run: make install-frontend
+
+      - name: Test
+        run: make test-frontend
+
+  build-frontend:
+    needs: test-frontend
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+
+      - name: Build
+        run: make build-frontend
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-frontend
+          path: src/frontend/dist
+
+  build-backend:
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ linux, windows, darwin ]
+        arch: [ arm64, amd64, 386 ]
+        exclude:
+          - os: darwin
+            arch: 386
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: build-frontend
+          path: src/frontend/dist
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: src/go.mod
+          cache-dependency-path: src/backend/go.sum
+
+      - name: Install
+        run: make install-backend
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: make build-backend
+
+      - if: ${{ matrix.os != 'windows' }}
+        run: mv dist/dlp-ui dist/dlp-ui_${{ matrix.os }}_${{ matrix.arch }}
+      - if: ${{ matrix.os == 'windows' }}
+        run: mv dist/dlp-ui dist/dlp-ui_${{ matrix.os }}_${{ matrix.arch }}.exe
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build-backend_${{ matrix.os }}_${{ matrix.arch }}
+          path: dist
+
+  release:
+    needs: build-backend
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: dist
+          pattern: build-backend_*_*
+          merge-multiple: true
+
+      - name: Release
+        uses: softprops/action-gh-release@v3
+        with:
+          draft: true
+          name: DLP UI ${{ github.ref_name }}
+          files: dist/*
