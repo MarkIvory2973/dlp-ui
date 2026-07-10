@@ -47,6 +47,7 @@ build: build-frontend build-backend
 .PHONY: clean
 clean:
 	rm -rf src/frontend/node_modules
+	rm -f src/frontend/.eslintcache
 	rm -rf src/frontend/dist
 	rm -rf src/backend/embed/webui
 	rm -rf dist
