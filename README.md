@@ -12,9 +12,10 @@ Download latest release from [GitHub Releases](https://github.com/MarkIvory2973/
 
 #### Requirements
 
- - Go 1.26+
- - GNU Make
- - Git
+- Go 1.26+
+- UPX
+- GNU Make
+- Git
 
 Clone the repository:
 
@@ -45,10 +46,10 @@ make clean
 >
 > The following binaries are required and must be placed in the `./bin` directory (the same directory as the `dlp-ui` executable):
 >
->  - [x] `yt-dlp`
->  - [x] `aria2c`
->  - [x] `ffmpeg`
->  - [x] `ffprobe`
+> - [x] `yt-dlp`
+> - [x] `aria2c`
+> - [x] `ffmpeg`
+> - [x] `ffprobe`
 
 ## Usage
 

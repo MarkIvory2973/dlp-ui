@@ -6,6 +6,8 @@ NPM := npm
 GO := go
 CGO_ENABLED := 0
 
+UPX := upx
+
 .PHONY: install-frontend
 install-frontend:
 	cd src/frontend && $(NPM) install
@@ -37,6 +39,7 @@ build-backend:
 	mv src/frontend/dist src/backend/embed/webui
 
 	cd src/backend && $(GO) build -trimpath -ldflags="-s -w" -ldflags "-X dlp-ui/cmd.tag=${GITHUB_REF_NAME} -X dlp-ui/cmd.commit=${GITHUB_SHA}" -o dlp-ui
+	-cd src && $(UPX) --best --lzma dsync
 
 	mkdir -p dist
 	mv src/backend/dlp-ui dist
