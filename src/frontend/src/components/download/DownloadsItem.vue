@@ -15,7 +15,7 @@ const { downloads } = storeToRefs(useDownloadsStore())
     v-for="download in downloads"
     v-bind:key="download"
     :url="download.url"
-    :task="download.task"
+    :job="download.job"
     :errors="download.errors"
   />
 </template>

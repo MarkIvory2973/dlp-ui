@@ -12,7 +12,7 @@ import { VarletImportResolver } from '@varlet/import-resolver'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/webui/',
+  base: '/frontend/',
   plugins: [
     vue(),
     vueJsx(),

@@ -1,79 +1,76 @@
 package ytdlp
 
 import (
-	"dlp-ui/pkg/utils"
+	"dlp-ui/pkg/outputs"
 	"slices"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Parsed struct {
-	URL  string `json:"url"`
-	Task struct {
+	URL string `json:"url"`
+	Job struct {
 		Entries []map[string]any `json:"entries"`
 		Done    bool             `json:"done"`
-	} `json:"task"`
+	} `json:"job"`
 	Errors []string `json:"errors"`
 }
 
-func NewParser(browser string, url string, parseds []Parsed) (func(*logrus.Entry), error) {
-	var args []string
-	if browser != "" {
-		args = []string{
-			"--cookies-from-browser", browser,
-			"-j", url,
-		}
-	} else {
-		args = []string{
-			"-j", url,
-		}
-	}
+type Parseds []Parsed
 
-	command, stdout, stderr, err := new(args...)
-	if err != nil {
-		return nil, err
-	}
-
-	err = command.Start()
-	if err != nil {
-		return nil, err
-	}
-
-	index := slices.IndexFunc(parseds, func(parsed Parsed) bool {
+func (parseds Parseds) Contains(url string) bool {
+	return slices.ContainsFunc(parseds, func(parsed Parsed) bool {
 		return url == parsed.URL
 	})
-	parsed := parseds[index]
+}
 
-	return func(logger *logrus.Entry) {
-		go utils.ScanJsonFunc(stdout, func(entry map[string]any, err error) {
-			if err != nil {
-				parsed.Errors = append(parsed.Errors, err.Error())
-				parseds[index] = parsed
-			}
+func (parseds *Parseds) Append(url string) {
+	parsed := Parsed{
+		URL: url,
+	}
+	*parseds = append(*parseds, parsed)
+}
 
-			parsed.Task.Entries = append(parsed.Task.Entries, entry)
-			parseds[index] = parsed
+func (parseds Parseds) Index(url string) int {
+	return slices.IndexFunc(parseds, func(parsed Parsed) bool {
+		return url == parsed.URL
+	})
+}
+
+func (parseds *Parseds) Delete(url string) {
+	*parseds = slices.DeleteFunc(*parseds, func(parsed Parsed) bool {
+		return url == parsed.URL
+	})
+}
+
+func NewParser(url string) (func(Parseds), error) {
+	extraArgs := []string{
+		"-j", url,
+	}
+	process, err := new(extraArgs...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = process.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	return func(parseds Parseds) {
+		index := parseds.Index(url)
+
+		go outputs.ScanObjectFunc(process.Stdout, func(entry map[string]any) {
+			parseds[index].Job.Entries = append(parseds[index].Job.Entries, entry)
 		})
 
-		go utils.ScanLineFunc(stderr, func(error string) {
-			parsed.Errors = append(parsed.Errors, error)
-			parseds[index] = parsed
+		go outputs.ScanTextFunc(process.Stderr, func(error string) {
+			parseds[index].Errors = append(parseds[index].Errors, error)
 		})
 
-		err := command.Wait()
+		err := process.Wait()
 		if err != nil {
-			parsed.Errors = append(parsed.Errors, err.Error())
+			parseds[index].Errors = append(parseds[index].Errors, err.Error())
 		}
 
-		parsed.Task.Done = true
-		parseds[index] = parsed
-
-		for _, entry := range parsed.Task.Entries {
-			logger.Debugf("parsed entry '%s'", entry["title"])
-		}
-
-		for _, error := range parsed.Errors {
-			logger.Errorf("error while parsing: %s", error)
-		}
+		parseds[index].Job.Done = true
 	}, nil
 }

@@ -9,7 +9,7 @@ import PreviewButton from './parsed/PreviewButton.vue'
 import DownloadButton from './parsed/DownloadButton.vue'
 import PreviewItem from './parsed/PreviewItem.vue'
 
-const { url, task, errors } = defineProps(['url', 'task', 'errors'])
+const { url, job, errors } = defineProps(['url', 'job', 'errors'])
 
 const floating = ref(false)
 </script>
@@ -17,9 +17,9 @@ const floating = ref(false)
 <template>
   <VarCard
     :title="
-      task.entries?.length
-        ? `${task.entries[0].title} (${task.entries.length})`
-        : task.done
+      job.entries?.length
+        ? `${job.entries[0].title} (${job.entries.length})`
+        : job.done
           ? '无解析结果'
           : '正在解析 URL'
     "
@@ -33,12 +33,12 @@ const floating = ref(false)
       <div class="extra">
         <DeleteButton :url="url" />
         <PreviewButton v-model="floating" />
-        <DownloadButton :url="url" :task="task" />
+        <DownloadButton :url="url" :job="job" />
       </div>
     </template>
     <template #floating-content>
       <VarDivider dashed />
-      <PreviewItem :task="task" />
+      <PreviewItem :job="job" />
     </template>
   </VarCard>
 </template>

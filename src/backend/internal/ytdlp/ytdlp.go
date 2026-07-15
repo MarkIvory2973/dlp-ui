@@ -7,23 +7,42 @@ import (
 
 var baseArgs = []string{
 	"-q", "--no-warnings",
-	"--downloader", "bin/aria2c",
-	"--ffmpeg-location", "bin",
+	"--downloader", "aria2c",
 }
 
-func new(extraArgs ...string) (*exec.Cmd, io.ReadCloser, io.ReadCloser, error) {
+type Process struct {
+	Command *exec.Cmd
+	Stdout  io.ReadCloser
+	Stderr  io.ReadCloser
+}
+
+func (process Process) Start() error {
+	return process.Command.Start()
+}
+
+func (process Process) Wait() error {
+	return process.Command.Wait()
+}
+
+func new(extraArgs ...string) (Process, error) {
 	args := append(baseArgs, extraArgs...)
-	command := exec.Command("bin/yt-dlp", args...)
+	command := exec.Command("yt-dlp", args...)
 
 	stdout, err := command.StdoutPipe()
 	if err != nil {
-		return nil, nil, nil, err
+		return Process{}, err
 	}
 
 	stderr, err := command.StderrPipe()
 	if err != nil {
-		return nil, nil, nil, err
+		return Process{}, err
 	}
 
-	return command, stdout, stderr, nil
+	process := Process{
+		Command: command,
+		Stdout:  stdout,
+		Stderr:  stderr,
+	}
+
+	return process, nil
 }

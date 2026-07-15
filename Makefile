@@ -1,6 +1,3 @@
-GITHUB_REF_NAME ?= dev
-GITHUB_SHA ?= none
-
 NPM := npm
 
 GO := go
@@ -25,6 +22,8 @@ test-frontend:
 
 .PHONY: test-backend
 test-backend:
+	mkdir -p src/backend/embed/frontend
+
 	cd src/backend && $(GO) test ./...
 
 .PHONY: test
@@ -34,23 +33,38 @@ test: test-frontend test-backend
 build-frontend:
 	cd src/frontend && $(NPM) run build
 
+	mkdir -p dist
+	mv src/frontend/dist dist
+	mv dist/dist dist/frontend
+
 .PHONY: build-backend
 build-backend:
-	mv src/frontend/dist src/backend/embed/webui
+	mkdir -p src/backend/embed
+	cp -r dist/frontend src/backend/embed
 
-	cd src/backend && $(GO) build -trimpath -ldflags="-s -w" -ldflags "-X dlp-ui/cmd.tag=${GITHUB_REF_NAME} -X dlp-ui/cmd.commit=${GITHUB_SHA}" -o dlp-ui
-	-cd src && $(UPX) --best --lzma dsync
+	cd src/backend && $(GO) build -trimpath -ldflags="-s -w" -o dlp-ui
+	-cd src/backend && $(UPX) --best --lzma dlp-ui
 
-	mkdir -p dist
-	mv src/backend/dlp-ui dist
+	mkdir -p dist/backend
+	mv src/backend/dlp-ui dist/backend
 
 .PHONY: build
 build: build-frontend build-backend
 
-.PHONY: clean
-clean:
+.PHONY: clean-frontend
+clean-frontend:
 	rm -rf src/frontend/node_modules
 	rm -f src/frontend/.eslintcache
 	rm -rf src/frontend/dist
-	rm -rf src/backend/embed/webui
+	rm -rf dist/dist
+	rm -rf dist/frontend
+
+.PHONY: clean-backend
+clean-backend:
+	rm -rf src/backend/embed
+	rm -f src/backend/dlp-ui
+	rm -rf dist/backend
+
+.PHONY: clean
+clean: clean-frontend clean-backend
 	rm -rf dist

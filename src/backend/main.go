@@ -1,47 +1,35 @@
 package main
 
 import (
-	"dlp-ui/cmd"
-	"dlp-ui/internal/web"
-	"dlp-ui/internal/web/views"
-	"dlp-ui/pkg/log"
+	"dlp-ui/internal/server"
+	"dlp-ui/internal/server/handlers"
 	"embed"
-	"io/fs"
-	"net/http"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
+	"github.com/pkg/browser"
 )
 
 //go:embed embed/*
 var embedFS embed.FS
 
-func main() {
-	level := cmd.GetLogLevel()
-	logger, err := log.New("dlp-ui", level)
+func StartServer() {
+	router := server.New()
+
+	handlers.HandleParse(router)
+	handlers.HandleDownloads(router)
+	handlers.HandleFrontend(router, embedFS)
+
+	router.Run("localhost:5000")
+}
+
+func StartURL() {
+	err := browser.OpenURL("http://localhost:5000/frontend")
 	if err != nil {
 		panic(err)
 	}
+}
 
-	webuiFS, err := fs.Sub(embedFS, "embed/webui")
-	if err != nil {
-		logger.Fatalf("failed to load webui: %v", err)
-	}
-
-	cmd.PrintBanner()
-
-	mode := cmd.GetMode()
-	gin.SetMode(mode)
-
-	router := web.New(logger)
-
-	if mode != gin.ReleaseMode {
-		router.Use(cors.Default())
-	}
-
-	views.RouteParse(router)
-	views.RouteDownload(router)
-	router.StaticFS("/webui", http.FS(webuiFS))
-
-	router.Run("localhost:5000")
+func main() {
+	go StartServer()
+	go StartURL()
+	select {}
 }

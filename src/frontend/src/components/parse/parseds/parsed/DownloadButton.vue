@@ -7,7 +7,7 @@ import { Snackbar } from '@varlet/ui'
 // local
 import { useEnvStore } from '@/stores/env'
 
-const { url, task } = defineProps(['url', 'task'])
+const { url, job } = defineProps(['url', 'job'])
 
 const { baseUrl } = storeToRefs(useEnvStore())
 const formats = ref([])
@@ -47,16 +47,16 @@ async function download() {
         <VarIcon name="download" />
       </VarButton>
       <VarButton
-        :disabled="!task.entries?.length || !task.entries[0].formats?.length"
+        :disabled="!job.entries?.length || !job.entries[0].formats?.length"
         style="padding: 0 6px"
       >
         <VarIcon name="menu-down" />
       </VarButton>
     </VarButtonGroup>
 
-    <template v-if="task.entries?.length && task.entries[0].formats?.length" #options>
+    <template v-if="job.entries?.length && job.entries[0].formats?.length" #options>
       <VarMenuOption
-        v-for="format in task.entries[0].formats"
+        v-for="format in job.entries[0].formats"
         v-bind:key="format"
         :label="`${format.format} (.${format.ext})`"
         :value="format.format_id"

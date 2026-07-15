@@ -44,8 +44,27 @@ jobs:
           name: build-frontend
           path: src/frontend/dist
 
+  test-backend:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: src/backend/go.mod
+          cache-dependency-path: src/backend/go.sum
+
+      - name: Install
+        run: make install-backend
+      
+      - name: Test
+        run: make test-backend
+
   build-backend:
-    needs: build-frontend
+    needs:
+      - test-backend
+      - build-frontend
     runs-on: ubuntu-latest
     strategy:
       matrix:

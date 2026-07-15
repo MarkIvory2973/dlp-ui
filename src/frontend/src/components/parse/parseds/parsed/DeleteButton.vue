@@ -18,6 +18,14 @@ async function remove() {
   })
   if (!response.ok) {
     switch (response.status) {
+      case 404: {
+        Snackbar.error('无法删除解析结果: 解析结果不存在')
+        break
+      }
+      case 423: {
+        Snackbar.warning(`无法删除解析结果: 解析任务未完成`)
+        break
+      }
       default: {
         const error = (await response.text()) || '未知错误'
         Snackbar.error(`无法删除解析结果: ${error}`)

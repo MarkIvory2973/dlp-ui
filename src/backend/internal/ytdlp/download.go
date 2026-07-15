@@ -1,92 +1,97 @@
 package ytdlp
 
 import (
-	"dlp-ui/pkg/utils"
+	"dlp-ui/pkg/outputs"
 	"slices"
-
-	"github.com/sirupsen/logrus"
 )
 
 type Download struct {
-	URL  string `json:"url"`
-	Task struct {
+	URL string `json:"url"`
+	Job struct {
 		Title   string `json:"title"`
 		Current int    `json:"current"`
 		Total   int    `json:"total"`
 		Speed   int    `json:"speed"`
 		Done    bool   `json:"done"`
-	} `json:"task"`
+	} `json:"job"`
 	Errors []string `json:"errors"`
 }
 
-func NewDownloader(browser string, url string, format string, downloads []Download) (func(*logrus.Entry), error) {
-	var args []string
-	if browser != "" {
-		args = []string{
-			"--cookies-from-browser", browser,
-			"-f", format,
-			"--downloader-args", "aria2c:--summary-interval=1 --human-readable=false",
-			"-O", "before_dl:TITLE: %(title)s",
-			"-o", "down/%(title)s.%(ext)s",
-			url,
-		}
-	} else {
-		args = []string{
-			"-f", format,
-			"--downloader-args", "aria2c:--summary-interval=1 --human-readable=false",
-			"-O", "before_dl:TITLE: %(title)s",
-			"-o", "down/%(title)s.%(ext)s",
-			url,
-		}
-	}
+type Downloads []Download
 
-	command, stdout, stderr, err := new(args...)
-	if err != nil {
-		return nil, err
-	}
-
-	err = command.Start()
-	if err != nil {
-		return nil, err
-	}
-
-	index := slices.IndexFunc(downloads, func(download Download) bool {
+func (downloads Downloads) Contains(url string) bool {
+	return slices.ContainsFunc(downloads, func(download Download) bool {
 		return url == download.URL
 	})
-	download := downloads[index]
+}
 
-	return func(logger *logrus.Entry) {
-		go utils.ScanLineFunc(stdout, func(content string) {
-			title := utils.ReadTitle(content)
+func (downloads *Downloads) Append(url string) {
+	download := Download{
+		URL: url,
+	}
+	*downloads = append(*downloads, download)
+}
+
+func (downloads Downloads) Index(url string) int {
+	return slices.IndexFunc(downloads, func(download Download) bool {
+		return url == download.URL
+	})
+}
+
+func (downloads *Downloads) Delete(url string) {
+	*downloads = slices.DeleteFunc(*downloads, func(download Download) bool {
+		return url == download.URL
+	})
+}
+
+func NewDownloader(url string, format string) (func(Downloads), error) {
+	extraArgs := []string{
+		"-f", format,
+		"--downloader-args", "aria2c:--summary-interval=1 --human-readable=false",
+		"-O", "before_dl:TITLE: %(title)s",
+		"-o", "down/%(title)s.%(ext)s",
+		url,
+	}
+	process, err := new(extraArgs...)
+	if err != nil {
+		return nil, err
+	}
+
+	err = process.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	return func(downloads Downloads) {
+		index := downloads.Index(url)
+
+		go outputs.ScanAria2Func(process.Stdout, func(title string, current int, total int, speed int) {
 			if title != "" {
-				download.Task.Title = title
+				downloads[index].Job.Title = title
 			}
 
-			current, total, speed := utils.ReadAria2(content)
-			if current != -1 && total != -1 && speed != -1 {
-				download.Task.Current = current
-				download.Task.Total = total
-				download.Task.Speed = speed
+			if current != -1 {
+				downloads[index].Job.Current = current
 			}
 
-			downloads[index] = download
+			if total != -1 {
+				downloads[index].Job.Total = total
+			}
+
+			if speed != -1 {
+				downloads[index].Job.Speed = speed
+			}
 		})
 
-		go utils.ScanLineFunc(stderr, func(error string) {
-			download.Errors = append(download.Errors, error)
-			downloads[index] = download
+		go outputs.ScanTextFunc(process.Stderr, func(error string) {
+			downloads[index].Errors = append(downloads[index].Errors, error)
 		})
 
-		err = command.Wait()
+		err := process.Wait()
 		if err != nil {
-			download.Errors = append(download.Errors, err.Error())
+			downloads[index].Errors = append(downloads[index].Errors, err.Error())
 		}
 
-		download.Task.Done = true
-		downloads[index] = download
-
-		for _, error := range download.Errors {
-			logger.Errorf("error while downloading: %s", error)
-		}
+		downloads[index].Job.Done = true
 	}, nil
 }

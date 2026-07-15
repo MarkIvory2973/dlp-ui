@@ -15,7 +15,7 @@ const { parseds } = storeToRefs(useParsedsStore())
     v-for="parsed in parseds"
     v-bind:key="parsed"
     :url="parsed.url"
-    :task="parsed.task"
+    :job="parsed.job"
     :errors="parsed.errors"
   />
 </template>

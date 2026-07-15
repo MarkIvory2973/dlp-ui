@@ -1,4 +1,4 @@
-package web
+package server
 
 import (
 	"net/http"
@@ -9,18 +9,19 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	logger := setup()
+	t.Setenv("MODE", "test")
 
-	router := New(logger)
+	router := New()
 
-	router.GET("/TestNew", func(context *gin.Context) {
-		context.Status(http.StatusOK)
+	router.GET("/ping", func(context *gin.Context) {
+		context.String(http.StatusOK, "pong")
 	})
 
 	apitest.New().
 		Handler(router).
-		Get("/TestNew").
+		Get("/ping").
 		Expect(t).
 		Status(http.StatusOK).
+		Body("pong").
 		End()
 }
