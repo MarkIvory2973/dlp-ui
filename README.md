@@ -4,6 +4,15 @@ DLP UI is a frontend for yt-dlp.
 
 ## Installation
 
+> **Note:**
+>
+> The following binaries are required and must be available in your `$PATH`:
+>
+> - [x] `yt-dlp`
+> - [x] `aria2c`
+> - [x] `ffmpeg`
+> - [x] `ffprobe`
+
 ### GitHub Releases
 
 Download latest release from [GitHub Releases](https://github.com/MarkIvory2973/dlp-ui/releases/latest).
@@ -41,15 +50,6 @@ Clean files:
 ```bash
 make clean
 ```
-
-> **Note:**
->
-> The following binaries are required and must be placed in the `./bin` directory (the same directory as the `dlp-ui` executable):
->
-> - [x] `yt-dlp`
-> - [x] `aria2c`
-> - [x] `ffmpeg`
-> - [x] `ffprobe`
 
 ## Usage
 
