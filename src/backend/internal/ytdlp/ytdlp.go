@@ -1,6 +1,7 @@
 package ytdlp
 
 import (
+	"dlp-ui/cmd"
 	"io"
 	"os/exec"
 )
@@ -22,6 +23,13 @@ func (process Process) Start() error {
 
 func (process Process) Wait() error {
 	return process.Command.Wait()
+}
+
+func init() {
+	browser := cmd.GetBrowser()
+	if browser != "" {
+		baseArgs = append(baseArgs, "--cookies-from-browser", browser)
+	}
 }
 
 func new(extraArgs ...string) (Process, error) {
