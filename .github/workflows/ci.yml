@@ -14,16 +14,17 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - uses: actions/setup-node@v6
+      - name: Install Go
+        uses: actions/setup-node@v6
         with:
           node-version-file: src/frontend/package.json
           cache: npm
           cache-dependency-path: src/frontend/package-lock.json
 
-      - name: Install
+      - name: Install dependencies
         run: make install-frontend
 
-      - name: Test
+      - name: Test units
         run: make test-frontend
 
   build-frontend:
@@ -33,10 +34,10 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - name: Install
+      - name: Install dependencies
         run: make install-frontend
 
-      - name: Build
+      - name: Build frontend
         run: make build-frontend
 
       - uses: actions/upload-artifact@v7
@@ -50,15 +51,19 @@ jobs:
     steps:
       - uses: actions/checkout@main
 
-      - uses: actions/setup-go@v6
+      - name: Install YT-DLP
+        run: sudo apt-get install -y yt-dlp
+
+      - name: Install Go
+        uses: actions/setup-go@v6
         with:
           go-version-file: src/backend/go.mod
           cache-dependency-path: src/backend/go.sum
 
-      - name: Install
+      - name: Install dependencies
         run: make install-backend
       
-      - name: Test
+      - name: Test units
         run: make test-backend
 
   build-backend:
@@ -81,28 +86,29 @@ jobs:
           name: build-frontend
           path: src/frontend/dist
 
-      - uses: actions/setup-go@v6
+      - name: Install Go
+        uses: actions/setup-go@v6
         with:
           go-version-file: src/backend/go.mod
           cache-dependency-path: src/backend/go.sum
 
-      - run: |
-          sudo apt-get update
-          sudo apt-get install -y upx-ucl
+      - name: Install nFPM
+        run: go install github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
 
-      - name: Install
+      - name: Install dependencies
         run: make install-backend
 
-      - name: Build
+      - name: Build backend
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
         run: make build-backend
 
-      - if: ${{ matrix.os != 'windows' }}
-        run: mv dist/dlp-ui dist/dlp-ui_${{ matrix.os }}_${{ matrix.arch }}
-      - if: ${{ matrix.os == 'windows' }}
-        run: mv dist/dlp-ui dist/dlp-ui_${{ matrix.os }}_${{ matrix.arch }}.exe
+      - name: Build packages
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+        run: make package
 
       - uses: actions/upload-artifact@v7
         with:

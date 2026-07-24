@@ -1,70 +1,83 @@
-NPM := npm
+GOOS ?= $(shell go env GOOS)
+GOARCH ?= $(shell go env GOARCH)
+ifeq ($(GOOS),windows)
+GOOUT := dlp-ui_$(GOOS)_$(GOARCH).exe
+else
+GOOUT := dlp-ui_$(GOOS)_$(GOARCH)
+endif
 
-GO := go
-CGO_ENABLED := 0
+NFPM := nfpm
+NFPMFLAGS := --packager deb
 
-UPX := upx
-
+# Install dependencies
 .PHONY: install-frontend
 install-frontend:
-	cd src/frontend && $(NPM) install
+	$(MAKE) -C src/frontend install
 
 .PHONY: install-backend
 install-backend:
-	cd src/backend && $(GO) mod download
+	$(MAKE) -C src/backend install
 
 .PHONY: install
 install: install-frontend install-backend
 
+# Test units
 .PHONY: test-frontend
 test-frontend:
-	cd src/frontend && $(NPM) run lint
+	$(MAKE) -C src/frontend test
 
 .PHONY: test-backend
 test-backend:
-	mkdir -p src/backend/embed/frontend
-
-	cd src/backend && $(GO) test ./...
+	$(MAKE) -C src/backend test
 
 .PHONY: test
 test: test-frontend test-backend
 
-.PHONY: build-frontend
-build-frontend:
-	cd src/frontend && $(NPM) run build
-
+# Build frontend and backend
+dist/frontend/:
+	$(MAKE) -C src/frontend build
 	mkdir -p dist
-	mv src/frontend/dist dist
-	mv dist/dist dist/frontend
+	$(RM) -r dist/frontend
+	mv src/frontend/frontend dist
 
-.PHONY: build-backend
-build-backend:
+.PHONY: build-frontend
+build-frontend: dist/frontend/
+
+src/backend/embed/frontend/: dist/frontend/
 	mkdir -p src/backend/embed
 	cp -r dist/frontend src/backend/embed
 
-	cd src/backend && $(GO) build -trimpath -ldflags="-s -w" -o dlp-ui
-	-cd src/backend && $(UPX) --best --lzma dlp-ui
-
+dist/backend/output: src/backend/embed/frontend/
+	$(MAKE) -C src/backend build
 	mkdir -p dist/backend
-	mv src/backend/dlp-ui dist/backend
+	mv src/backend/output dist/backend
+
+.PHONY: build-backend
+build-backend: dist/backend/output
 
 .PHONY: build
-build: build-frontend build-backend
+build: build-backend
 
+# Build packages
+.PHONY: package
+package: dist/backend/output
+ifeq ($(GOOS),linux)
+	$(NFPM) pkg $(NFPMFLAGS) --target dist/backend
+endif
+	mv dist/backend/output dist/backend/$(GOOUT)
+
+# Clean files
 .PHONY: clean-frontend
 clean-frontend:
-	rm -rf src/frontend/node_modules
-	rm -f src/frontend/.eslintcache
-	rm -rf src/frontend/dist
-	rm -rf dist/dist
-	rm -rf dist/frontend
+	$(MAKE) -C src/frontend clean
+	$(RM) -r dist/frontend
 
 .PHONY: clean-backend
 clean-backend:
-	rm -rf src/backend/embed
-	rm -f src/backend/dlp-ui
-	rm -rf dist/backend
+	$(RM) -r src/backend/embed
+	$(MAKE) -C src/backend clean
+	$(RM) -r dist/backend
 
 .PHONY: clean
 clean: clean-frontend clean-backend
-	rm -rf dist
+	$(RM) -r dist

@@ -1,3 +1,6 @@
+/.install
+/frontend/
+
 # Logs
 logs
 *.log

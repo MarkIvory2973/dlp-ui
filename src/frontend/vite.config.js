@@ -12,6 +12,9 @@ import { VarletImportResolver } from '@varlet/import-resolver'
 
 // https://vite.dev/config/
 export default defineConfig({
+  build: {
+    outDir: 'frontend',
+  },
   base: '/frontend/',
   plugins: [
     vue(),
