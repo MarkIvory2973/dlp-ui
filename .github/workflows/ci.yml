@@ -113,7 +113,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: build-backend_${{ matrix.os }}_${{ matrix.arch }}
-          path: dist
+          path: dist/backend
 
   release:
     needs: build-backend
@@ -122,7 +122,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v8
         with:
-          path: dist
+          path: dist/backend
           pattern: build-backend_*_*
           merge-multiple: true
 
@@ -131,4 +131,4 @@ jobs:
         with:
           draft: true
           name: DLP UI ${{ github.ref_name }}
-          files: dist/*
+          files: dist/backend/*
