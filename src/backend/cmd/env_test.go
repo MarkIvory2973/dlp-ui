@@ -16,6 +16,7 @@ func TestGetMode(t *testing.T) {
 		{"Debug", "debug", gin.DebugMode},
 		{"Release", "release", gin.ReleaseMode},
 		{"Test", "test", gin.TestMode},
+		{"Upper", "Debug", gin.DebugMode},
 		{"Default", "", gin.ReleaseMode},
 	}
 

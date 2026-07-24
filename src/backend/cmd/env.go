@@ -8,6 +8,7 @@ import (
 
 func GetMode() string {
 	mode := os.Getenv("MODE")
+	mode = strings.ToLower(mode)
 
 	switch mode {
 	case "debug":
