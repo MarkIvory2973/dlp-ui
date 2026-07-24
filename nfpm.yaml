@@ -1,13 +1,12 @@
 name: "dlp-ui"
 arch: "${GOARCH}"
 platform: "linux"
-version: "1.2.0"
+version: "1.2.1"
 section: "utils"
 maintainer: "Mark Ivory <markivory2973@gmail.com>"
 description: DLP UI is a frontend for yt-dlp.
 homepage: "https://github.com/MarkIvory2973/dlp-ui"
 depends:
- - yt-dlp
  - aria2
  - ffmpeg
 contents:
