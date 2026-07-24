@@ -3,22 +3,15 @@ package cmd
 import (
 	"os"
 	"strings"
-
-	"github.com/gin-gonic/gin"
 )
 
-func GetMode() string {
-	mode := os.Getenv("MODE")
-	mode = strings.ToLower(mode)
+func GetDebug() bool {
+	debug := os.Getenv("DEBUG")
+	debug = strings.ToLower(debug)
 
-	switch mode {
-	case "debug":
-		return gin.DebugMode
-	case "release":
-		return gin.ReleaseMode
-	case "test":
-		return gin.TestMode
-	default:
-		return gin.ReleaseMode
+	if debug != "true" {
+		return false
 	}
+
+	return true
 }

@@ -3,28 +3,26 @@ package cmd
 import (
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetMode(t *testing.T) {
+func TestGetDebug(t *testing.T) {
 	tests := []struct {
 		Name string
 		Case string
-		Want string
+		Want bool
 	}{
-		{"Debug", "debug", gin.DebugMode},
-		{"Release", "release", gin.ReleaseMode},
-		{"Test", "test", gin.TestMode},
-		{"Upper", "Debug", gin.DebugMode},
-		{"Default", "", gin.ReleaseMode},
+		{"True", "true", true},
+		{"False", "false", false},
+		{"Upper", "TruE", true},
+		{"None", "", false},
 	}
 
 	for _, test := range tests {
 		t.Run(test.Name, func(t *testing.T) {
-			t.Setenv("MODE", test.Case)
+			t.Setenv("DEBUG", test.Case)
 
-			got := GetMode()
+			got := GetDebug()
 			require.Equal(t, test.Want, got)
 		})
 	}

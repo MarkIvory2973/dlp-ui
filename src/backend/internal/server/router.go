@@ -8,8 +8,11 @@ import (
 )
 
 func init() {
-	mode := cmd.GetMode()
-	gin.SetMode(mode)
+	if cmd.GetDebug() {
+		gin.SetMode(gin.DebugMode)
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 }
 
 func New() *gin.Engine {
@@ -17,8 +20,7 @@ func New() *gin.Engine {
 	router.SetTrustedProxies(nil)
 	router.Use(gin.Recovery())
 
-	mode := cmd.GetMode()
-	if mode != gin.ReleaseMode {
+	if cmd.GetDebug() {
 		router.Use(cors.Default())
 	}
 
