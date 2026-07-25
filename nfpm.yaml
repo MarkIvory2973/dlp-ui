@@ -10,5 +10,5 @@ depends:
  - aria2
  - ffmpeg
 contents:
-  - src: dist/backend/output
+  - src: dist/backend/dlp-ui
     dst: /usr/bin/dlp-ui

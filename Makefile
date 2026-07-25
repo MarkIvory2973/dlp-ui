@@ -47,24 +47,24 @@ src/backend/embed/frontend/: dist/frontend/
 	mkdir -p src/backend/embed
 	cp -r dist/frontend src/backend/embed
 
-dist/backend/output: src/backend/embed/frontend/
+dist/backend/dlp-ui: src/backend/embed/frontend/
 	$(MAKE) -C src/backend build
 	mkdir -p dist/backend
-	mv src/backend/output dist/backend
+	mv src/backend/dlp-ui dist/backend
 
 .PHONY: build-backend
-build-backend: dist/backend/output
+build-backend: dist/backend/dlp-ui
 
 .PHONY: build
 build: build-backend
 
 # Build packages
 .PHONY: package
-package: dist/backend/output
+package: dist/backend/dlp-ui
 ifeq ($(GOOS),linux)
 	$(NFPM) pkg $(NFPMFLAGS) --target dist/backend
 endif
-	mv dist/backend/output dist/backend/$(GOOUT)
+	mv dist/backend/dlp-ui dist/backend/$(GOOUT)
 
 # Clean files
 .PHONY: clean-frontend

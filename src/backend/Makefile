@@ -26,16 +26,16 @@ test: embed/frontend/test
 	$(GO) test ./...
 
 # Build binaries
-output: .install $(shell find . -type f -iname "*.go")
-	$(GO) build $(GOFLAGS) -o output
-	-$(UPX) $(UPXFLAGS) output
+dlp-ui: .install $(shell find . -type f -iname "*.go")
+	$(GO) build $(GOFLAGS) -o dlp-ui
+	-$(UPX) $(UPXFLAGS) dlp-ui
 
 .PHONY: build
-build: output
+build: dlp-ui
 
 # Clean files
 .PHONY: clean
 clean:
 	$(RM) embed/frontend/test
 	$(RM) .install
-	$(RM) output
+	$(RM) dlp-ui

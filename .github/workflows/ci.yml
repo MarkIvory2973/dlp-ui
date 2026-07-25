@@ -128,7 +128,7 @@ jobs:
           pattern: build-backend_*_*
           merge-multiple: true
 
-      - name: Release
+      - name: Release ${{ github.ref_name }}
         uses: softprops/action-gh-release@v3
         with:
           draft: true
