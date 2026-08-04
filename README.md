@@ -46,12 +46,6 @@ Build binaries:
 make build
 ```
 
-Build packages:
-
-```bash
-make package
-```
-
 Clean files:
 
 ```bash
