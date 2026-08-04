@@ -1,4 +1,4 @@
-NPM := npm
+include mk/npm.mk
 
 # Install dependencies
 .install: package.json package-lock.json
