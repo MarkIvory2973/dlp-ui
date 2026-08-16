@@ -48,6 +48,7 @@ dist/backend/output: src/backend/embed/frontend/
 build-backend: dist/backend/output
 ifeq ($(OS),linux)
 	$(NFPM) pkg --packager deb $(NFPMFLAGS)
+	$(NFPM) pkg --packager rpm $(NFPMFLAGS)
 endif
 	mv dist/backend/output dist/backend/$(OUTPUT)
 
