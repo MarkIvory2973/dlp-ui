@@ -7,15 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func init() {
-	if cmd.GetDebug() {
-		gin.SetMode(gin.DebugMode)
-	} else {
-		gin.SetMode(gin.ReleaseMode)
-	}
-}
+func New(mode string) *gin.Engine {
+	gin.SetMode(mode)
 
-func New() *gin.Engine {
 	router := gin.New()
 	router.SetTrustedProxies(nil)
 	router.Use(gin.Recovery())

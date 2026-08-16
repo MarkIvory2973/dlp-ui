@@ -1,10 +1,12 @@
 package main
 
 import (
+	"dlp-ui/cmd"
 	"dlp-ui/internal/server"
 	"dlp-ui/internal/server/handlers"
 	"embed"
 
+	"github.com/gin-gonic/gin"
 	"github.com/pkg/browser"
 )
 
@@ -12,7 +14,14 @@ import (
 var embedFS embed.FS
 
 func StartServer() {
-	router := server.New()
+	var mode string
+	if cmd.GetDebug() {
+		mode = gin.DebugMode
+	} else {
+		mode = gin.ReleaseMode
+	}
+
+	router := server.New(mode)
 
 	handlers.HandleParse(router)
 	handlers.HandleDownload(router)

@@ -9,9 +9,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	t.Setenv("MODE", "test")
-
-	router := New()
+	router := New(gin.TestMode)
 
 	router.GET("/ping", func(context *gin.Context) {
 		context.String(http.StatusOK, "pong")
