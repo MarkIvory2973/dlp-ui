@@ -9,7 +9,7 @@ import (
 
 var downloads = ytdlp.Downloads{}
 
-func HandleDownloads(router *gin.Engine) {
+func HandleDownload(router *gin.Engine) {
 	router.GET("/api/download", func(context *gin.Context) {
 		context.JSON(http.StatusOK, downloads)
 	})
