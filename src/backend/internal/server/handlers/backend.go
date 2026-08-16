@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"dlp-ui/cmd"
 	"net/http"
+	"net/url"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -11,6 +13,20 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(request *http.Request) bool {
+		if cmd.GetDebug() {
+			return true
+		}
+
+		content := request.Header.Get("Origin")
+		origin, err := url.Parse(content)
+		if err != nil {
+			return false
+		}
+
+		if request.Host != origin.Host {
+			return false
+		}
+
 		return true
 	},
 }
