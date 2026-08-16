@@ -34,14 +34,31 @@ async function refresh() {
   }
 }
 
-let timer = null
+const { baseWsUrl } = storeToRefs(useEnvStore())
+let backend = null
 onMounted(async () => {
   await refresh()
-  timer = setInterval(refresh, 500)
+
+  if (backend) {
+    return
+  }
+
+  backend = new WebSocket(`${baseWsUrl.value}/backend/download`)
+  backend.onmessage = async function (event) {
+    if (event.data != 'refresh') {
+      return
+    }
+
+    await refresh()
+  }
 })
 onUnmounted(() => {
-  clearInterval(timer)
-  timer = null
+  if (!backend) {
+    return
+  }
+
+  backend.close(1000)
+  backend = null
 })
 </script>
 

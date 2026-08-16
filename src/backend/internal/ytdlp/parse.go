@@ -41,7 +41,7 @@ func (parseds *Parseds) Delete(url string) {
 	})
 }
 
-func NewParser(url string) (func(Parseds), error) {
+func NewParser(url string) (func(Parseds, chan string), error) {
 	extraArgs := []string{
 		"-j", url,
 	}
@@ -55,22 +55,26 @@ func NewParser(url string) (func(Parseds), error) {
 		return nil, err
 	}
 
-	return func(parseds Parseds) {
+	return func(parseds Parseds, parseSignal chan string) {
 		index := parseds.Index(url)
 
 		go outputs.ScanObjectFunc(process.Stdout, func(entry map[string]any) {
 			parseds[index].Job.Entries = append(parseds[index].Job.Entries, entry)
+			parseSignal <- "refresh"
 		})
 
 		go outputs.ScanTextFunc(process.Stderr, func(error string) {
 			parseds[index].Errors = append(parseds[index].Errors, error)
+			parseSignal <- "refresh"
 		})
 
 		err := process.Wait()
 		if err != nil {
 			parseds[index].Errors = append(parseds[index].Errors, err.Error())
+			parseSignal <- "refresh"
 		}
 
 		parseds[index].Job.Done = true
+		parseSignal <- "refresh"
 	}, nil
 }

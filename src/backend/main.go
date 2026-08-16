@@ -16,6 +16,7 @@ func StartServer() {
 
 	handlers.HandleParse(router)
 	handlers.HandleDownload(router)
+	handlers.HandleBackend(router)
 	handlers.HandleFrontend(router, embedFS)
 
 	router.Run("localhost:5000")

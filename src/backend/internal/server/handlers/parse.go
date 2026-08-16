@@ -29,6 +29,7 @@ func HandleParse(router *gin.Engine) {
 		}
 
 		parseds.Append(data.URL)
+		parseSignal <- "refresh"
 
 		parser, err := ytdlp.NewParser(data.URL)
 		if err != nil {
@@ -36,7 +37,7 @@ func HandleParse(router *gin.Engine) {
 			return
 		}
 
-		go parser(parseds)
+		go parser(parseds, parseSignal)
 
 		context.Status(http.StatusOK)
 	})
@@ -62,6 +63,7 @@ func HandleParse(router *gin.Engine) {
 		}
 
 		parseds.Delete(data.URL)
+		parseSignal <- "refresh"
 
 		context.Status(http.StatusOK)
 	})

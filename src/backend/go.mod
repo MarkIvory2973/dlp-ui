@@ -6,6 +6,7 @@ require (
 	github.com/gin-contrib/cors v1.7.7
 	github.com/gin-gonic/gin v1.12.0
 	github.com/google/go-cmp v0.7.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/steinfletcher/apitest v1.6.0
 	github.com/stretchr/testify v1.11.1

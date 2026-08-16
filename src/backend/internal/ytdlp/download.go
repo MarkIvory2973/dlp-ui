@@ -44,7 +44,7 @@ func (downloads *Downloads) Delete(url string) {
 	})
 }
 
-func NewDownloader(url string, format string) (func(Downloads), error) {
+func NewDownloader(url string, format string) (func(Downloads, chan string), error) {
 	extraArgs := []string{
 		"-f", format,
 		"--downloader-args", "aria2c:--summary-interval=1 --human-readable=false",
@@ -62,36 +62,43 @@ func NewDownloader(url string, format string) (func(Downloads), error) {
 		return nil, err
 	}
 
-	return func(downloads Downloads) {
+	return func(downloads Downloads, downloadSignal chan string) {
 		index := downloads.Index(url)
 
 		go outputs.ScanAria2Func(process.Stdout, func(title string, current int, total int, speed int) {
 			if title != "" {
 				downloads[index].Job.Title = title
+				downloadSignal <- "refresh"
 			}
 
 			if current != -1 {
 				downloads[index].Job.Current = current
+				downloadSignal <- "refresh"
 			}
 
 			if total != -1 {
 				downloads[index].Job.Total = total
+				downloadSignal <- "refresh"
 			}
 
 			if speed != -1 {
 				downloads[index].Job.Speed = speed
+				downloadSignal <- "refresh"
 			}
 		})
 
 		go outputs.ScanTextFunc(process.Stderr, func(error string) {
 			downloads[index].Errors = append(downloads[index].Errors, error)
+			downloadSignal <- "refresh"
 		})
 
 		err := process.Wait()
 		if err != nil {
 			downloads[index].Errors = append(downloads[index].Errors, err.Error())
+			downloadSignal <- "refresh"
 		}
 
 		downloads[index].Job.Done = true
+		downloadSignal <- "refresh"
 	}, nil
 }

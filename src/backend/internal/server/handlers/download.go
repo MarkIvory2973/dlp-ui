@@ -32,9 +32,11 @@ func HandleDownload(router *gin.Engine) {
 			}
 
 			downloads.Delete(data.URL)
+			downloadSignal <- "refresh"
 		}
 
 		downloads.Append(data.URL)
+		downloadSignal <- "refresh"
 
 		downloader, err := ytdlp.NewDownloader(data.URL, data.Format)
 		if err != nil {
@@ -42,7 +44,7 @@ func HandleDownload(router *gin.Engine) {
 			return
 		}
 
-		go downloader(downloads)
+		go downloader(downloads, downloadSignal)
 
 		context.Status(http.StatusOK)
 	})
@@ -68,6 +70,7 @@ func HandleDownload(router *gin.Engine) {
 		}
 
 		downloads.Delete(data.URL)
+		downloadSignal <- "refresh"
 
 		context.Status(http.StatusOK)
 	})
